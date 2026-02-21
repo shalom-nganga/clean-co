@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 const LINKS = [
   ['Services', '/services'],
   ['Pricing', '/pricing'],
+  ['Contact', '/contact'],
   ['Book Now', '/booking'],
-  ['Admin', '/admin'],
+  // ['Admin', '/admin'],
 ];
-
 export default function Footer() {
   return (
     <footer style={{ background: '#0a1220', padding: '48px 5% 32px', borderTop: '1px solid rgba(255,255,255,0.05)', fontFamily: "'DM Sans', sans-serif" }}>

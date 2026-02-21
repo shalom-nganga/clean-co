@@ -6,6 +6,7 @@ import Services from './pages/Services';
 import Pricing from './pages/Pricing';
 import Booking from './pages/Booking';
 import Dashboard from './admin/Dashboard';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -15,8 +16,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/services" element={<Services />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/booking" element={<Booking />} />
-        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/cleanco-ops-2025" element={<Dashboard />} />
       </Routes>
       <Footer />
     </Router>

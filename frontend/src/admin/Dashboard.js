@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
+import Login from './Login';
 
 const TABS = ['Overview', 'Bookings', 'Customers'];
 
@@ -9,7 +11,7 @@ const STATUS_COLORS = {
   cancelled: { bg: 'rgba(220,53,69,0.1)', color: '#c0392b', label: 'Cancelled' },
 };
 
-function StatCard({ icon, label, value, sub, delay = 0 }) {
+function StatCard({ icon, label, value, sub }) {
   return (
     <div style={{
       background: 'white', border: '1px solid #eae9e4', borderRadius: 4,
@@ -37,45 +39,116 @@ function Badge({ status }) {
   );
 }
 
+const mapBookings = (data) => data.map(b => ({
+  id: b.id,
+  firstName: b.first_name,
+  lastName: b.last_name,
+  email: b.email,
+  phone: b.phone,
+  address: b.address,
+  city: b.city,
+  service: b.service,
+  frequency: b.frequency,
+  package: b.package,
+  date: b.date,
+  time: b.time,
+  notes: b.notes,
+  status: b.status,
+  createdAt: b.created_at,
+}));
+
 export default function Dashboard() {
   const [tab, setTab] = useState('Overview');
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [authed, setAuthed] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
+  // Auth check
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('cleanco_bookings') || '[]');
-    // Add demo bookings if empty
-    if (stored.length === 0) {
-      const demo = [
-        { id: 1, firstName: 'Sarah', lastName: 'Mitchell', email: 'sarah@example.com', phone: '+1 555 010 1234', address: '45 Maple Ave', city: 'New York', service: 'Residential Cleaning', frequency: 'Bi-Weekly', package: 'Standard', date: '2025-03-10', time: '9:00 AM', notes: 'Have a dog, please knock.', status: 'confirmed', createdAt: '2025-02-18T10:00:00Z' },
-        { id: 2, firstName: 'James', lastName: 'Thornton', email: 'james@acmecorp.com', phone: '+1 555 020 5678', address: '200 Corporate Blvd', city: 'Brooklyn', service: 'Corporate Office', frequency: 'Weekly', package: 'Premium', date: '2025-03-08', time: '8:00 AM', notes: 'Access via reception. Ask for James.', status: 'confirmed', createdAt: '2025-02-17T14:00:00Z' },
-        { id: 3, firstName: 'Lena', lastName: 'Kovacs', email: 'lena@example.com', phone: '+1 555 030 9012', address: '12 Birch Street', city: 'Manhattan', service: 'Deep Cleaning', frequency: 'One-Time', package: 'Premium', date: '2025-03-05', time: '10:00 AM', notes: '', status: 'completed', createdAt: '2025-02-16T09:00:00Z' },
-        { id: 4, firstName: 'Marcus', lastName: 'Reid', email: 'marcus@example.com', phone: '+1 555 040 3456', address: '78 Oak Lane', city: 'Queens', service: 'Move In / Move Out', frequency: 'One-Time', package: 'Standard', date: '2025-03-12', time: '11:00 AM', notes: 'Moving out — need full clean for landlord inspection.', status: 'pending', createdAt: '2025-02-19T08:30:00Z' },
-        { id: 5, firstName: 'Priya', lastName: 'Sharma', email: 'priya@example.com', phone: '+1 555 050 7890', address: '34 Elm Road', city: 'Bronx', service: 'Eco-Friendly Cleaning', frequency: 'Monthly', package: 'Basic', date: '2025-03-15', time: '2:00 PM', notes: 'Allergic to strong scents — eco products only please.', status: 'pending', createdAt: '2025-02-19T11:00:00Z' },
-      ];
-      localStorage.setItem('cleanco_bookings', JSON.stringify(demo));
-      setBookings(demo);
-    } else {
-      setBookings(stored);
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthed(!!session);
+      setAuthLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthed(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const saveBookings = (updated) => {
-    setBookings(updated);
-    localStorage.setItem('cleanco_bookings', JSON.stringify(updated));
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuthed(false);
   };
 
-  const updateStatus = (id, status) => {
+  // Fetch bookings
+  useEffect(() => {
+    if (!authed) return;
+
+    const fetchBookings = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching bookings:', error);
+        setLoading(false);
+        return;
+      }
+
+      if (data.length === 0) {
+        const demo = [
+          { first_name: 'Sarah', last_name: 'Mitchell', email: 'sarah@example.com', phone: '+1 555 010 1234', address: '45 Maple Ave', city: 'New York', service: 'Residential Cleaning', frequency: 'Bi-Weekly', package: 'Standard', date: '2025-03-10', time: '9:00 AM', notes: 'Have a dog, please knock.', status: 'confirmed' },
+          { first_name: 'James', last_name: 'Thornton', email: 'james@acmecorp.com', phone: '+1 555 020 5678', address: '200 Corporate Blvd', city: 'Brooklyn', service: 'Corporate Office', frequency: 'Weekly', package: 'Premium', date: '2025-03-08', time: '8:00 AM', notes: 'Access via reception. Ask for James.', status: 'confirmed' },
+          { first_name: 'Lena', last_name: 'Kovacs', email: 'lena@example.com', phone: '+1 555 030 9012', address: '12 Birch Street', city: 'Manhattan', service: 'Deep Cleaning', frequency: 'One-Time', package: 'Premium', date: '2025-03-05', time: '10:00 AM', notes: '', status: 'completed' },
+          { first_name: 'Marcus', last_name: 'Reid', email: 'marcus@example.com', phone: '+1 555 040 3456', address: '78 Oak Lane', city: 'Queens', service: 'Move In / Move Out', frequency: 'One-Time', package: 'Standard', date: '2025-03-12', time: '11:00 AM', notes: 'Moving out — need full clean for landlord inspection.', status: 'pending' },
+          { first_name: 'Priya', last_name: 'Sharma', email: 'priya@example.com', phone: '+1 555 050 7890', address: '34 Elm Road', city: 'Bronx', service: 'Eco-Friendly Cleaning', frequency: 'Monthly', package: 'Basic', date: '2025-03-15', time: '2:00 PM', notes: 'Allergic to strong scents — eco products only please.', status: 'pending' },
+        ];
+        await supabase.from('bookings').insert(demo);
+        const { data: seeded } = await supabase
+          .from('bookings')
+          .select('*')
+          .order('created_at', { ascending: false });
+        setBookings(mapBookings(seeded || []));
+      } else {
+        setBookings(mapBookings(data));
+      }
+
+      setLoading(false);
+    };
+
+    fetchBookings();
+  }, [authed]);
+
+  const updateStatus = async (id, status) => {
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) { console.error(error); return; }
+
     const updated = bookings.map(b => b.id === id ? { ...b, status } : b);
-    saveBookings(updated);
+    setBookings(updated);
     if (selectedBooking?.id === id) setSelectedBooking({ ...selectedBooking, status });
   };
 
-  const deleteBooking = (id) => {
-    const updated = bookings.filter(b => b.id !== id);
-    saveBookings(updated);
+  const deleteBooking = async (id) => {
+    const { error } = await supabase
+      .from('bookings')
+      .delete()
+      .eq('id', id);
+
+    if (error) { console.error(error); return; }
+
+    setBookings(bookings.filter(b => b.id !== id));
     setSelectedBooking(null);
   };
 
@@ -89,7 +162,7 @@ export default function Dashboard() {
   const customers = Object.values(
     bookings.reduce((acc, b) => {
       const key = b.email;
-      if (!acc[key]) acc[key] = { name: `${b.firstName} ${b.lastName}`, email: b.email, phone: b.phone, city: b.city, bookings: [], totalSpend: 0 };
+      if (!acc[key]) acc[key] = { name: `${b.firstName} ${b.lastName}`, email: b.email, phone: b.phone, city: b.city, bookings: [] };
       acc[key].bookings.push(b);
       return acc;
     }, {})
@@ -102,12 +175,36 @@ export default function Dashboard() {
     completed: bookings.filter(b => b.status === 'completed').length,
   };
 
+  // Auth loading
+  if (authLoading) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: '100vh', background: '#0f1a2e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'rgba(249,248,245,0.4)', fontSize: 15 }}>Checking access...</p>
+      </div>
+    );
+  }
+
+  // Not logged in
+  if (!authed) {
+    return <Login onLogin={() => setAuthed(true)} />;
+  }
+
+  // Bookings loading
+  if (loading) {
+    return (
+      <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: '100vh', background: '#f4f3f0', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 72 }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 16 }}>⏳</div>
+          <p style={{ color: '#999', fontSize: 15 }}>Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: '#f4f3f0', minHeight: '100vh', paddingTop: 72 }}>
       <style>{`
         .dash-row:hover { background: #fafaf8 !important; }
-        .status-btn { border: none; padding: '6px 14px'; border-radius: 2; font-size: 12; font-family: "'DM Sans', sans-serif"; cursor: pointer; transition: opacity 0.2s; }
-        .status-btn:hover { opacity: 0.8; }
       `}</style>
 
       {/* TOP BAR */}
@@ -117,8 +214,16 @@ export default function Dashboard() {
             <p style={{ fontSize: 12, letterSpacing: '2px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 4 }}>Admin Dashboard</p>
             <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, fontWeight: 700, color: '#f9f8f5' }}>CleanCo Control Panel</h1>
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(249,248,245,0.4)' }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            <div style={{ fontSize: 13, color: 'rgba(249,248,245,0.4)' }}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </div>
+            <button onClick={handleLogout} style={{
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(249,248,245,0.6)', padding: '8px 16px', borderRadius: 2,
+              fontFamily: "'DM Sans', sans-serif", fontSize: 13, cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}>Sign Out</button>
           </div>
         </div>
       </div>
@@ -159,7 +264,7 @@ export default function Dashboard() {
                   className="dash-row"
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: '1px solid #f0efe9', cursor: 'pointer', transition: 'background 0.2s', gap: 12 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f0efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#f0efe9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#0f1a2e' }}>
                       {b.firstName[0]}{b.lastName[0]}
                     </div>
                     <div>
@@ -181,7 +286,6 @@ export default function Dashboard() {
         {tab === 'Bookings' && (
           <div style={{ display: 'grid', gridTemplateColumns: selectedBooking ? '1fr 380px' : '1fr', gap: 24 }}>
             <div>
-              {/* FILTERS */}
               <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
                 <input
                   value={search} onChange={e => setSearch(e.target.value)}
@@ -195,7 +299,6 @@ export default function Dashboard() {
                 </select>
               </div>
 
-              {/* TABLE */}
               <div style={{ background: 'white', border: '1px solid #eae9e4', borderRadius: 4, overflow: 'hidden' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.5fr 1fr 1fr 80px', padding: '12px 20px', background: '#f9f8f5', borderBottom: '1px solid #eae9e4' }}>
                   {['Client', 'Service', 'Date', 'Status', ''].map(h => (
@@ -324,7 +427,7 @@ export default function Dashboard() {
                       <span style={{ color: '#333', fontWeight: 500, textAlign: 'right', maxWidth: '55%' }}>{value}</span>
                     </div>
                   ))}
-                  <div style={{ marginTop: 8 }}>
+                  <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {c.bookings.map(b => <Badge key={b.id} status={b.status} />)}
                   </div>
                 </div>

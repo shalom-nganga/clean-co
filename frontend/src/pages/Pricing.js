@@ -57,8 +57,8 @@ const PACKAGES = [
 ];
 
 const FAQS = [
-  { q: 'Do I need to be home during the clean?', a: 'Not at all. Many of our clients provide a key or access code. We\'re fully insured and all cleaners are background-checked.' },
-  { q: 'What if I\'m not happy with the result?', a: 'We offer a 100% satisfaction guarantee. If something wasn\'t done to your standard, contact us within 24 hours and we\'ll return to fix it — free of charge.' },
+  { q: 'Do I need to be home during the clean?', a: "Not at all. Many of our clients provide a key or access code. We're fully insured and all cleaners are background-checked." },
+  { q: "What if I'm not happy with the result?", a: "We offer a 100% satisfaction guarantee. If something wasn't done to your standard, contact us within 24 hours and we'll return to fix it — free of charge." },
   { q: 'Can I change or cancel my plan?', a: 'Yes, anytime. There are no contracts or cancellation fees. Just give us 48 hours notice before your next scheduled clean.' },
   { q: 'Do you bring your own supplies?', a: 'Yes, we bring everything we need. If you have a preference for specific products or have allergies, just let us know in your booking notes.' },
   { q: 'How do I get a custom quote?', a: 'Click the "Request a Custom Quote" button below the packages and fill in your details. We\'ll get back to you within a few hours.' },
@@ -99,6 +99,16 @@ export default function Pricing() {
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: '#f9f8f5', color: '#0f1a2e' }}>
+      <style>{`
+        @media (max-width: 900px) {
+          .packages-grid { grid-template-columns: 1fr !important; max-width: 480px; margin-left: auto; margin-right: auto; }
+          .packages-grid > div { transform: scale(1) !important; }
+        }
+        @media (max-width: 768px) {
+          .custom-quote-banner { flex-direction: column !important; text-align: center; }
+          .freq-toggle button { padding: 10px 14px !important; font-size: 13px !important; }
+        }
+      `}</style>
 
       {/* HERO */}
       <section style={{
@@ -110,11 +120,11 @@ export default function Pricing() {
         <div style={{ position: 'absolute', bottom: -40, left: '-5%', width: 300, height: 300, borderRadius: '50%', background: 'rgba(62,207,176,0.04)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 700, margin: '0 auto', position: 'relative' }}>
           <p style={{ color: '#3ecfb0', fontSize: 13, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 20, fontWeight: 500 }}>Transparent Pricing</p>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(40px, 5vw, 64px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 24 }}>
+          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 24 }}>
             Simple plans.<br />
             <em style={{ color: '#3ecfb0' }}>No surprises.</em>
           </h1>
-          <p style={{ fontSize: 17, color: 'rgba(249,248,245,0.6)', lineHeight: 1.7, fontWeight: 300 }}>
+          <p style={{ fontSize: 'clamp(15px, 2vw, 17px)', color: 'rgba(249,248,245,0.6)', lineHeight: 1.7, fontWeight: 300 }}>
             Choose a package that works for your space and schedule. Need something custom? We do that too.
           </p>
         </div>
@@ -122,7 +132,7 @@ export default function Pricing() {
 
       {/* FREQUENCY TOGGLE */}
       <section style={{ padding: '60px 5% 0', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', background: 'white', border: '1px solid #eae9e4', borderRadius: 4, padding: 4, gap: 4 }}>
+        <div className="freq-toggle" style={{ display: 'inline-flex', background: 'white', border: '1px solid #eae9e4', borderRadius: 4, padding: 4, gap: 4 }}>
           {Object.entries(frequencyLabels).map(([key, label]) => (
             <button key={key} onClick={() => setFrequency(key)} style={{
               background: frequency === key ? '#0f1a2e' : 'transparent',
@@ -132,7 +142,9 @@ export default function Pricing() {
               cursor: 'pointer', transition: 'all 0.2s', fontWeight: frequency === key ? 500 : 400,
             }}>
               {label}
-              {key === 'biweekly' && <span style={{ marginLeft: 6, background: '#3ecfb0', color: '#0f1a2e', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 600 }}>SAVE</span>}
+              {key === 'biweekly' && (
+                <span style={{ marginLeft: 6, background: '#3ecfb0', color: '#0f1a2e', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 600 }}>SAVE</span>
+              )}
             </button>
           ))}
         </div>
@@ -143,7 +155,7 @@ export default function Pricing() {
 
       {/* PACKAGES */}
       <section style={{ padding: '48px 5% 100px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, alignItems: 'start' }}>
+        <div className="packages-grid" style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, alignItems: 'start' }}>
           {PACKAGES.map((pkg, i) => (
             <FadeIn key={pkg.name} delay={i * 0.1}>
               <div style={{
@@ -198,7 +210,7 @@ export default function Pricing() {
                   display: 'block', textAlign: 'center',
                   background: pkg.popular ? '#3ecfb0' : 'transparent',
                   color: pkg.popular ? '#0f1a2e' : pkg.textColor,
-                  border: pkg.popular ? 'none' : `1.5px solid ${pkg.popular ? 'none' : '#0f1a2e'}`,
+                  border: pkg.popular ? 'none' : `1.5px solid #0f1a2e`,
                   padding: '14px 0', fontSize: 14, fontFamily: "'DM Sans', sans-serif",
                   fontWeight: 500, borderRadius: 2, textDecoration: 'none',
                   transition: 'all 0.2s',
@@ -212,7 +224,7 @@ export default function Pricing() {
 
         {/* CUSTOM QUOTE */}
         <FadeIn delay={0.3}>
-          <div style={{ maxWidth: 1100, margin: '48px auto 0', background: 'white', border: '1px solid #eae9e4', borderRadius: 4, padding: '40px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
+          <div className="custom-quote-banner" style={{ maxWidth: 1100, margin: '48px auto 0', background: 'white', border: '1px solid #eae9e4', borderRadius: 4, padding: '40px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 24 }}>
             <div>
               <p style={{ fontSize: 12, letterSpacing: '2px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 8, fontWeight: 500 }}>Need Something Different?</p>
               <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 26, fontWeight: 700, color: '#0f1a2e', marginBottom: 8 }}>Request a Custom Quote</h3>
@@ -245,8 +257,8 @@ export default function Pricing() {
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '22px 0', textAlign: 'left', gap: 16,
                 }}>
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 16, fontWeight: 500, color: '#0f1a2e' }}>{faq.q}</span>
-                  <span style={{ color: '#3ecfb0', fontSize: 20, lineHeight: 1, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0)' }}>+</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 'clamp(14px, 2vw, 16px)', fontWeight: 500, color: '#0f1a2e' }}>{faq.q}</span>
+                  <span style={{ color: '#3ecfb0', fontSize: 20, lineHeight: 1, transition: 'transform 0.3s', transform: openFaq === i ? 'rotate(45deg)' : 'rotate(0)', minWidth: 20 }}>+</span>
                 </button>
                 <div style={{
                   maxHeight: openFaq === i ? 200 : 0,

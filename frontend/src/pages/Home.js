@@ -35,10 +35,10 @@ function useInView(threshold = 0.15) {
   return [ref, inView];
 }
 
-function FadeIn({ children, delay = 0, className = '' }) {
+function FadeIn({ children, delay = 0 }) {
   const [ref, inView] = useInView();
   return (
-    <div ref={ref} className={className} style={{
+    <div ref={ref} style={{
       opacity: inView ? 1 : 0,
       transform: inView ? 'translateY(0)' : 'translateY(28px)',
       transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
@@ -64,6 +64,14 @@ export default function Home() {
         .service-card { background: white; border: 1px solid #eae9e4; padding: 36px 32px; border-radius: 2px; transition: box-shadow 0.3s, transform 0.3s; }
         .service-card:hover { box-shadow: 0 12px 40px rgba(15,26,46,0.08); transform: translateY(-4px); }
         .dot { width: 8px; height: 8px; border-radius: 50%; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+        @media (max-width: 768px) {
+          .why-us-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .stats-grid > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px; }
+          .hero-buttons { flex-direction: column !important; }
+          .hero-buttons a { text-align: center; }
+          .cta-box { padding: 48px 28px !important; }
+        }
       `}</style>
 
       {/* HERO */}
@@ -82,23 +90,23 @@ export default function Home() {
             <p style={{ color: '#3ecfb0', fontSize: 13, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 24, fontWeight: 500 }}>
               Professional Cleaning Services
             </p>
-            <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(44px, 6vw, 76px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 28 }}>
+            <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(36px, 6vw, 76px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 28 }}>
               A cleaner space.<br />
               <em style={{ color: '#3ecfb0', fontStyle: 'italic' }}>A clearer mind.</em>
             </h1>
-            <p style={{ fontSize: 18, color: 'rgba(249,248,245,0.65)', lineHeight: 1.7, marginBottom: 44, fontWeight: 300, maxWidth: 520 }}>
+            <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', color: 'rgba(249,248,245,0.65)', lineHeight: 1.7, marginBottom: 44, fontWeight: 300, maxWidth: 520 }}>
               We bring professional-grade cleaning to homes and offices across the city — so you can focus on what actually matters.
             </p>
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div className="hero-buttons" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               <Link to="/booking" style={{
                 background: '#3ecfb0', color: '#0f1a2e', padding: '16px 36px',
                 fontSize: 16, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-                borderRadius: 2, textDecoration: 'none', transition: 'background 0.2s',
+                borderRadius: 2, textDecoration: 'none',
               }}>Book a Clean</Link>
               <Link to="/services" style={{
                 background: 'transparent', color: '#f9f8f5', padding: '15px 36px',
                 fontSize: 16, border: '1.5px solid rgba(255,255,255,0.4)',
-                borderRadius: 2, textDecoration: 'none', transition: 'border-color 0.2s',
+                borderRadius: 2, textDecoration: 'none',
               }}>View Services</Link>
             </div>
           </div>
@@ -112,7 +120,7 @@ export default function Home() {
 
       {/* STATS */}
       <section style={{ background: '#0f1a2e', padding: '40px 5%' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
+        <div className="stats-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
           {STATS.map((s, i) => (
             <FadeIn key={s.label} delay={i * 0.1}>
               <div style={{ textAlign: 'center', padding: '16px 0', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
@@ -125,18 +133,18 @@ export default function Home() {
       </section>
 
       {/* SERVICES */}
-      <section style={{ padding: '100px 5%', background: '#f9f8f5' }}>
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 5%', background: '#f9f8f5' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <FadeIn>
             <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 16, fontWeight: 500 }}>What We Do</p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 16, lineHeight: 1.15 }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 16, lineHeight: 1.15 }}>
               Services built for<br />every kind of space
             </h2>
             <p style={{ color: '#667', fontSize: 17, maxWidth: 480, lineHeight: 1.7, marginBottom: 60, fontWeight: 300 }}>
               Whether it's your living room or your boardroom, we show up ready.
             </p>
           </FadeIn>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
             {SERVICES.map((s, i) => (
               <FadeIn key={s.title} delay={i * 0.1}>
                 <div className="service-card">
@@ -151,13 +159,13 @@ export default function Home() {
       </section>
 
       {/* WHY US */}
-      <section style={{ padding: '100px 5%', background: 'white' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 5%', background: 'white' }}>
+        <div className="why-us-grid" style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
           <FadeIn>
             <div style={{ position: 'relative' }}>
-              <div style={{ background: 'linear-gradient(135deg, #0f1a2e, #1e3a5f)', borderRadius: 4, padding: '60px 48px', color: 'white' }}>
+              <div style={{ background: 'linear-gradient(135deg, #0f1a2e, #1e3a5f)', borderRadius: 4, padding: 'clamp(32px, 5vw, 60px) clamp(24px, 4vw, 48px)', color: 'white' }}>
                 <div style={{ fontSize: 64, marginBottom: 24 }}>🧹</div>
-                <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
+                <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, lineHeight: 1.2 }}>
                   "We don't just clean.<br />We restore."
                 </div>
                 <div style={{ width: 40, height: 2, background: '#3ecfb0', marginTop: 24 }} />
@@ -168,7 +176,7 @@ export default function Home() {
           <FadeIn delay={0.2}>
             <div>
               <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 16, fontWeight: 500 }}>Why Choose Us</p>
-              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 32, lineHeight: 1.2 }}>
+              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(24px, 3.5vw, 44px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 32, lineHeight: 1.2 }}>
                 The standard is high.<br />The process is simple.
               </h2>
               {[
@@ -193,11 +201,11 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section style={{ padding: '100px 5%', background: '#0f1a2e' }}>
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 5%', background: '#0f1a2e' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <FadeIn>
             <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 16, fontWeight: 500 }}>Testimonials</p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 60, lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(26px, 4vw, 48px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 60, lineHeight: 1.2 }}>
               What our clients say
             </h2>
           </FadeIn>
@@ -210,7 +218,7 @@ export default function Home() {
                 transition: 'opacity 0.5s ease, transform 0.5s ease',
                 pointerEvents: activeTestimonial === i ? 'auto' : 'none',
               }}>
-                <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(18px, 2.5vw, 24px)', color: '#f9f8f5', lineHeight: 1.6, fontStyle: 'italic', marginBottom: 28 }}>
+                <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(16px, 2.5vw, 24px)', color: '#f9f8f5', lineHeight: 1.6, fontStyle: 'italic', marginBottom: 28 }}>
                   "{t.text}"
                 </p>
                 <div style={{ color: '#3ecfb0', fontWeight: 500, fontSize: 15 }}>{t.name}</div>
@@ -229,14 +237,14 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '100px 5%', background: '#f9f8f5' }}>
+      <section style={{ padding: 'clamp(60px, 8vw, 100px) 5%', background: '#f9f8f5' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <FadeIn>
-            <div style={{ background: 'linear-gradient(135deg, #0f1a2e, #162640)', borderRadius: 4, padding: '72px 60px', position: 'relative', overflow: 'hidden' }}>
+            <div className="cta-box" style={{ background: 'linear-gradient(135deg, #0f1a2e, #162640)', borderRadius: 4, padding: '72px 60px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', border: '1px solid rgba(62,207,176,0.15)' }} />
               <div style={{ position: 'absolute', bottom: -20, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(62,207,176,0.05)' }} />
               <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 20, fontWeight: 500 }}>Get Started Today</p>
-              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 20, lineHeight: 1.15 }}>
+              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(26px, 4vw, 48px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 20, lineHeight: 1.15 }}>
                 Ready for a space<br />you're proud of?
               </h2>
               <p style={{ color: 'rgba(249,248,245,0.55)', fontSize: 16, marginBottom: 40, fontWeight: 300, lineHeight: 1.6 }}>

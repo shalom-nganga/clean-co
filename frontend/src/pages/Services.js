@@ -96,30 +96,35 @@ export default function Services() {
         .include-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0efe9; font-size: 14px; color: #444; }
         .include-item:last-child { border-bottom: none; }
         .meta-pill { background: #f0efe9; border-radius: 2px; padding: 8px 16px; font-size: 13px; color: #555; display: inline-block; }
+        @media (max-width: 768px) {
+          .service-row { grid-template-columns: 1fr !important; gap: 28px !important; padding: 48px 0 !important; }
+          .services-quick-nav { display: none !important; }
+          .service-cta-box { padding: 48px 24px !important; }
+        }
       `}</style>
 
       {/* HERO */}
       <section style={{
         background: 'linear-gradient(135deg, #0f1a2e 0%, #162640 100%)',
-        padding: '160px 5% 100px',
+        padding: 'clamp(120px, 15vw, 160px) 5% clamp(60px, 8vw, 100px)',
         position: 'relative', overflow: 'hidden',
       }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 400, height: 400, borderRadius: '50%', border: '1px solid rgba(62,207,176,0.1)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: -40, left: '30%', width: 250, height: 250, borderRadius: '50%', background: 'rgba(62,207,176,0.04)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <p style={{ color: '#3ecfb0', fontSize: 13, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 20, fontWeight: 500 }}>What We Offer</p>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(40px, 5vw, 68px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 24, maxWidth: 700 }}>
+          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(36px, 5vw, 68px)', fontWeight: 700, color: '#f9f8f5', lineHeight: 1.1, letterSpacing: '-1px', marginBottom: 24, maxWidth: 700 }}>
             Every space deserves<br />
             <em style={{ color: '#3ecfb0' }}>to shine.</em>
           </h1>
-          <p style={{ fontSize: 17, color: 'rgba(249,248,245,0.6)', lineHeight: 1.7, maxWidth: 520, fontWeight: 300 }}>
+          <p style={{ fontSize: 'clamp(15px, 2vw, 17px)', color: 'rgba(249,248,245,0.6)', lineHeight: 1.7, maxWidth: 520, fontWeight: 300 }}>
             From a quick freshen-up to a full deep clean, we have a service for every space, schedule, and budget.
           </p>
         </div>
       </section>
 
       {/* QUICK NAV */}
-      <section style={{ background: 'white', borderBottom: '1px solid #eae9e4', padding: '0 5%', position: 'sticky', top: 72, zIndex: 50 }}>
+      <section className="services-quick-nav" style={{ background: 'white', borderBottom: '1px solid #eae9e4', padding: '0 5%', position: 'sticky', top: 72, zIndex: 50 }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0, overflowX: 'auto' }}>
           {SERVICES.map((s, i) => (
             <button key={s.title} onClick={() => {
@@ -140,16 +145,16 @@ export default function Services() {
       </section>
 
       {/* SERVICES LIST */}
-      <section style={{ padding: '0 5% 100px' }}>
+      <section style={{ padding: '0 5% clamp(60px, 8vw, 100px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           {SERVICES.map((s, i) => (
-            <div id={`service-${i}`} key={s.title} className="service-row" style={{ flexDirection: i % 2 === 0 ? 'row' : 'row-reverse' }}>
+            <div id={`service-${i}`} key={s.title} className="service-row">
               <FadeIn delay={0.1}>
                 <div>
                   <div style={{ fontSize: 48, marginBottom: 20 }}>{s.icon}</div>
                   <p style={{ fontSize: 12, letterSpacing: '2px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 12, fontWeight: 500 }}>{s.tagline}</p>
-                  <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 3vw, 42px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 20, lineHeight: 1.2 }}>{s.title}</h2>
-                  <p style={{ fontSize: 16, color: '#555', lineHeight: 1.75, fontWeight: 300, marginBottom: 32 }}>{s.desc}</p>
+                  <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(26px, 3vw, 42px)', fontWeight: 700, color: '#0f1a2e', marginBottom: 20, lineHeight: 1.2 }}>{s.title}</h2>
+                  <p style={{ fontSize: 'clamp(14px, 1.5vw, 16px)', color: '#555', lineHeight: 1.75, fontWeight: 300, marginBottom: 32 }}>{s.desc}</p>
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 36 }}>
                     <div className="meta-pill">⏱ {s.duration}</div>
                     <div className="meta-pill">📅 {s.frequency}</div>
@@ -181,21 +186,23 @@ export default function Services() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '80px 5%', background: '#0f1a2e' }}>
+      <section style={{ padding: 'clamp(48px, 8vw, 80px) 5%', background: '#0f1a2e' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', textAlign: 'center' }}>
           <FadeIn>
-            <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 20, fontWeight: 500 }}>Not Sure Where to Start?</p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 20, lineHeight: 1.2 }}>
-              We'll help you find<br />the right fit.
-            </h2>
-            <p style={{ color: 'rgba(249,248,245,0.5)', fontSize: 16, marginBottom: 36, fontWeight: 300, lineHeight: 1.6 }}>
-              Fill in your details and we'll recommend the best service for your space and schedule.
-            </p>
-            <Link to="/booking" style={{
-              background: '#3ecfb0', color: '#0f1a2e', padding: '16px 40px',
-              fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              borderRadius: 2, textDecoration: 'none', display: 'inline-block',
-            }}>Get a Free Recommendation</Link>
+            <div className="service-cta-box" style={{ padding: '0' }}>
+              <p style={{ fontSize: 12, letterSpacing: '2.5px', textTransform: 'uppercase', color: '#3ecfb0', marginBottom: 20, fontWeight: 500 }}>Not Sure Where to Start?</p>
+              <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: 700, color: '#f9f8f5', marginBottom: 20, lineHeight: 1.2 }}>
+                We'll help you find<br />the right fit.
+              </h2>
+              <p style={{ color: 'rgba(249,248,245,0.5)', fontSize: 16, marginBottom: 36, fontWeight: 300, lineHeight: 1.6 }}>
+                Fill in your details and we'll recommend the best service for your space and schedule.
+              </p>
+              <Link to="/booking" style={{
+                background: '#3ecfb0', color: '#0f1a2e', padding: '16px 40px',
+                fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                borderRadius: 2, textDecoration: 'none', display: 'inline-block',
+              }}>Get a Free Recommendation</Link>
+            </div>
           </FadeIn>
         </div>
       </section>
