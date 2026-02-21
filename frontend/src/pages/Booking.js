@@ -16,7 +16,7 @@ function useInView(threshold = 0.15) {
     );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
-  }, []);
+  }, [threshold]);
   return [ref, inView];
 }
 
@@ -56,7 +56,6 @@ export default function Booking() {
     package: '', date: '', time: '', notes: '', isCustom: false,
   });
 
-  // Pre-fill from URL params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const pkg = params.get('package');
@@ -78,54 +77,51 @@ export default function Booking() {
   const step3Valid = form.package && form.date && form.time;
 
   const handleSubmit = async () => {
-  // Save to Supabase database
-  const { error } = await supabase.from('bookings').insert([{
-    first_name: form.firstName,
-    last_name: form.lastName,
-    email: form.email,
-    phone: form.phone,
-    address: form.address,
-    city: form.city,
-    service: form.service,
-    frequency: form.frequency,
-    package: form.package,
-    date: form.date,
-    time: form.time,
-    notes: form.notes,
-    status: 'pending',
-  }]);
-
-  if (error) {
-    alert('Something went wrong saving your booking. Please try again.');
-    console.error(error);
-    return;
-  }
-
-  // Send email notifications
-  const { error: fnError } = await supabase.functions.invoke('send-booking-email', {
-    body: {
-      firstName: form.firstName,
-      lastName: form.lastName,
+    const { error } = await supabase.from('bookings').insert([{
+      first_name: form.firstName,
+      last_name: form.lastName,
       email: form.email,
       phone: form.phone,
-      service: form.service,
-      package: form.package,
-      frequency: form.frequency,
-      date: form.date,
-      time: form.time,
       address: form.address,
       city: form.city,
+      service: form.service,
+      frequency: form.frequency,
+      package: form.package,
+      date: form.date,
+      time: form.time,
       notes: form.notes,
-    },
-  });
+      status: 'pending',
+    }]);
 
-  if (fnError) {
-    // Booking was saved but email failed — don't block the user
-    console.error('Email notification failed:', fnError);
-  }
+    if (error) {
+      alert('Something went wrong saving your booking. Please try again.');
+      console.error(error);
+      return;
+    }
 
-  setSubmitted(true);
-}; 
+    const { error: fnError } = await supabase.functions.invoke('send-booking-email', {
+      body: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+        service: form.service,
+        package: form.package,
+        frequency: form.frequency,
+        date: form.date,
+        time: form.time,
+        address: form.address,
+        city: form.city,
+        notes: form.notes,
+      },
+    });
+
+    if (fnError) {
+      console.error('Email notification failed:', fnError);
+    }
+
+    setSubmitted(true);
+  };
 
   if (submitted) {
     return (
